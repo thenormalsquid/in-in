@@ -16,8 +16,8 @@ class Main extends Component {
           <Tabs>
             <TabList>
                 <Tab>Create</Tab>
-                <Tab>Preview</Tab>
-                <Tab>Export</Tab>
+                <Tab disabled={fields.length < 1}>Preview</Tab>
+                <Tab disabled={fields.length < 1}>Export</Tab>
             </TabList>
             <TabPanel>
               <FormBuilder 

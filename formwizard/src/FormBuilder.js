@@ -19,11 +19,19 @@ const AddButton = ({ action, value }) => {
 class Field extends Component {
     constructor(props) {
         super(props);
+        // need explicit binding for event handlers, otherwise we'd lose 'this' as
+        // a reference to the current class
         this.handleSelectChange = this.handleSelectChange.bind(this);
+        this.handleQuestionChange = this.handleQuestionChange.bind(this);
     }
 
     handleSelectChange(e) {
         this.props.changeFieldType(e.target.value, this.props.field);
+    }
+
+    handleQuestionChange(e) {
+        // update the question property
+        this.props.changeProperty(e.target.value, this.props.field, 'question');
     }
 
     render() {
@@ -35,22 +43,25 @@ class Field extends Component {
                     <div className="FormBuilder__Field__Conds">
                         <label htmlFor="conditions">Condition</label>
                         <select name="conditions">
-                            {field.parentCondType.map((cond, i) => {
+                            {field.parent.conditionTypes.map((cond, i) => {
                                 return <option key={i} value={cond.value}>{cond.label}</option>
                             })}
                         </select>
-                        {field.parentType === 'yes_no' ? 
+                        {/* conditional for yes/no case  */}
+                        {field.parent.type === 'yes_no' ? 
                           <div className="FormBuilder__Field__Conds__Inp">
-                              <select name="yesNoCond">
-                                {}
+                              <select name="yesNoCond" defaultValue={field.parent.value}>
+                                {field.parent.inputFields.map((radio, i) => {
+                                    return <option key={i} value={radio.value}>{radio.label}</option>
+                                })}
                               </select>
                           </div> :
-                          <input type={field.parentType} />
+                          <input type={field.parent.type} />
                         }
                     </div>
                    }
                    <label htmlFor="question">Question</label>
-                   <input name="question" type="text" />
+                   <input name="question" type="text" defaultValue="" value={field.question} onChange={this.handleQuestionChange} />
                    <label htmlFor="type">Type</label>
                    <select name="type" defaultValue={field.type} onChange={this.handleSelectChange}>
                        {initialFieldChoices.map((choice, i) => {

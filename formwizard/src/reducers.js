@@ -14,10 +14,9 @@ const initialState = {
     {
         id: guid(),
         type: 'number',
-        hidden: false,
         label: 'Number',
         parentCondValue: null,
-        parentId: null,
+        parent: null,
         question: null,
         value: null,
         children: null,
@@ -26,10 +25,9 @@ const initialState = {
     {
         id: guid(),
         type: 'text',
-        hidden: false,
         label: 'Text',
         parentCondValue: null,
-        parentId: null,
+        parent: null,
         question: null,
         value: null,
         children: null,
@@ -39,11 +37,10 @@ const initialState = {
         id: guid(),
         type: 'yes_no',
         label: 'Yes / No',
-        hidden: false,
         parentCondValue: null,
-        parentId: null,
+        parent: null,
         question: null,
-        value: null,
+        value: 1,
         inputFields: [{value: 1, type: "radio", label: "Yes"}, {value: 0, type: "radio", label: "No"}],
         children: null,
         conditionTypes: [conditionTypes[0]]
@@ -51,9 +48,6 @@ const initialState = {
    ],
    fields: [] //array of field types
 };
-
-// the conditional switch should ideally be more condensed and different functionality
-// split out
 
 const changeFieldType = (state, action) => {
     const stateClone = cloneDeep(state);
@@ -65,12 +59,32 @@ const changeFieldType = (state, action) => {
             for(let i = 0; i < fields.length; i++) {
                 if(fields[i].id === field.id) {
                     const updateField = state.initialFieldChoices.find(f => f.type === fieldType);
-                    const children = fields[i].children;
+                    let children = cloneDeep(field.children);
+                    // update children's conditional fields
+                    if(children) {
+                        children = children.map(child => {
+                            return {
+                                ...child,
+                                parent: {
+                                    id: field.id,
+                                    conditionTypes: updateField.conditionTypes,
+                                    type: updateField.type,
+                                    value: updateField.value,
+                                    inputFields: updateField.inputFields || null
+                                },
+                                parentCondValue: updateField.parentCondValue
+                            };
+                        });
+                    }
+
+                    if(field.parent) {
+                        updateField.parent = fields[i].parent;
+                    }
                     fields[i] = {
                         ...updateField,
                         id: field.id,
                         children
-                    }
+                    };
                     return; 
                 }
                 searchAndUpdate(fields[i].children, field);
@@ -92,10 +106,14 @@ const addSubInput = (state, { payload }) => {
                 if(parent.id === parentId) {
                     const newSub = { 
                         ...state.initialFieldChoices[0], 
-                        parentCondType: parent.conditionTypes,
-                        parentCondValue: parent.type === 'yes_no' ? 1 : null,
-                        parentType: parent.type,
-                        id: guid()
+                        parent: {
+                            id: parent.id,
+                            conditionTypes: parent.conditionTypes,
+                            type: parent.type,
+                            value: parent.value,
+                            inputFields: parent.inputFields || null
+                        },
+                        id: guid() 
                     };
                     if(parent.children) {
                         parent.children.push(newSub);
@@ -112,6 +130,8 @@ const addSubInput = (state, { payload }) => {
     return stateClone;
 }
 
+// the conditional switch should ideally be more condensed and different functionality
+// split out
 const formBuilder = (state = initialState, action) => {
     let fields;
     switch(action.type) {

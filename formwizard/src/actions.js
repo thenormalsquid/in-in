@@ -23,3 +23,12 @@ export const addSubInput = field => ({
        parentId: field.id 
     }
 });
+
+export const changeProperty = (newValue, field, propertyName) => ({
+    type: types.CHANGE_PROPERTIES,
+    payload: {
+        propertyName,
+        newValue,
+        field
+    }
+})
