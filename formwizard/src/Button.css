@@ -1,0 +1,15 @@
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    font-size: 1.2em;
+    text-align: center;
+    vertical-align: middle;
+    padding: 1em 2em;
+    white-space: nowrap;
+    border: 0px solid transparent;
+}
+
+.add {
+    background-color: #3ed1c4;
+    color: #fff;
+}

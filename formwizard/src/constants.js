@@ -1,0 +1,2 @@
+export const ADD_FIELD = 'ADD_FIELD';
+export const GET_INITIAL_FIELDS = 'GET_INITIAL_FIELDS';
