@@ -1,0 +1,58 @@
+{
+    "fields": [
+        {
+            "hidden": false,
+            "parent_condition_value": null,
+            "parent_condition_type": null,
+            "condition_types": ["Equals"], // Equals, Greater Than, Less Than
+            "type": "yes_no", // number, text
+            "label": "Yes / No",
+            "question": "Do you own a car?",
+            "fields": [{"value": 1, "type": "radio", "label": "Yes"}, {"value": 0, "type": "radio", "label": "No"}],
+            "value": 0, //false by default
+            "children": [
+                {
+                    "type": "text",
+                    "parent_type": "yes_no",
+                    "hidden": true,
+                    "parent_condition_value": 1,
+                    "parent_condition_types": ["Equals"],
+                    "label": "Text",
+                    "condition_types": ["Equals"],
+                    "question": "What is your car's model?",
+                    "value": null,
+                    "children": [
+                        {
+                            // could use generated ids to reference parent object
+                            "type": "number",
+                            "parent_type": "text",
+                            "hidden": true,
+                            "parent_condition_value": "Ford",
+                            "parent_condition_types": ["Equals"],
+                            "selected_parent_condition": "=",
+                            "label": "Number",
+                            "condition_types": ["Equals", "Greater Than", "Less Than"],
+                            "question": "How many wheels on your Ford?",
+                            "value": null,
+                            "children": [
+                                {
+                                 "type": "yes_no",
+                                 "hidden": true,
+                                    "parent_type": "number",
+                                    "parent_condition_value": 4,
+                                    "parent_condition_types": [{"label": "Equals", "value": "="}, "Greater Than", "Less Than"],
+                                    "selected_parent_condition": ">",
+                                    "label": "Yes / No",
+                                    "condition_types": ["Equals"],
+                                    "question": "Is your Ford street legal?",
+                                    "value": null
+                                }
+                            ]
+                        }                        
+                    ]
+                }
+            ]
+        }
+    ]
+
+}

@@ -1,0 +1,9 @@
+.Main {
+    box-sizing: border-box;
+    margin-top: 2%;
+}
+
+.react-tabs__tab-panel {
+    margin-left: 1%;
+    display: flex;
+}

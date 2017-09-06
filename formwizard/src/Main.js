@@ -1,10 +1,12 @@
 // main tabbed application view
 import React, { Component } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
+import './Main.css';
 
 export default class Main extends Component {
     render() {
-        return (<div id="formTab">
+        return (<section className="Main">
           <Tabs>
             <TabList>
                 <Tab>Create</Tab>
@@ -15,6 +17,6 @@ export default class Main extends Component {
             <TabPanel><h1>dd</h1></TabPanel>
             <TabPanel><h1>ee</h1></TabPanel>
           </Tabs>
-        </div>);
+        </section>);
     }
 }
