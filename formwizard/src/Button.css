@@ -13,3 +13,19 @@
     background-color: #3ed1c4;
     color: #fff;
 }
+
+.sub-input {
+    background-color: #002e5d;
+    padding: 0.2em 0.3em;
+    font-size: 0.8em;
+    color: #fff;
+}
+
+/*a lot of repeats that could be modularized  */
+
+.delete {
+    background-color: #f52e2e;
+    padding: 0.2em 0.3em;
+    font-size: 0.8em;
+    color: #fff;
+}

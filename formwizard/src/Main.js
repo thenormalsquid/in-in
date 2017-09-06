@@ -22,7 +22,6 @@ class Main extends Component {
             <TabPanel>
               <FormBuilder 
                 initialFieldChoices={initialFieldChoices} 
-                fields={fields}
                 actions={actions}
               />
             </TabPanel>
@@ -35,7 +34,8 @@ class Main extends Component {
 
 Main.propTypes = {
     actions: PropTypes.object.isRequired,
-    initialFieldChoices: PropTypes.array.isRequired
+    initialFieldChoices: PropTypes.array.isRequired,
+    fields: PropTypes.array.isRequired
 }
 
 // fields will be built out as we progress through the form builder
