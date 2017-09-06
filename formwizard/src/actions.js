@@ -24,11 +24,19 @@ export const addSubInput = field => ({
     }
 });
 
-export const changeProperty = (newValue, field, propertyName) => ({
+export const changeProperty = (newValue, field, propertyName, isParentOnly = false) => ({
     type: types.CHANGE_PROPERTIES,
     payload: {
         propertyName,
         newValue,
+        isParentOnly,
+        field
+    }
+});
+
+export const deleteField = (field) => ({
+    type: types.DELETE_FIELD,
+    payload: {
         field
     }
 })

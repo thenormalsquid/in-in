@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, remove } from 'lodash';
 import { guid } from './utils';
 import * as types from './constants';
 
@@ -72,7 +72,7 @@ const changeFieldType = (state, action) => {
                                     value: updateField.value,
                                     inputFields: updateField.inputFields || null
                                 },
-                                parentCondValue: updateField.parentCondValue
+                                parentCondValue: updateField.conditionTypes[0].value
                             };
                         });
                     }
@@ -95,6 +95,8 @@ const changeFieldType = (state, action) => {
     return stateClone;
 }
 
+// TODO: a lot of these recursive search can be refactored into their own function
+// most of the functionality is repeated
 const addSubInput = (state, { payload }) => {
     const stateClone = cloneDeep(state);
     const { fields } = stateClone;
@@ -113,6 +115,7 @@ const addSubInput = (state, { payload }) => {
                             value: parent.value,
                             inputFields: parent.inputFields || null
                         },
+                        parentCondValue: parent.conditionTypes[0].value,
                         id: guid() 
                     };
                     if(parent.children) {
@@ -130,6 +133,63 @@ const addSubInput = (state, { payload }) => {
     return stateClone;
 }
 
+const updateProperty = (state, { payload }) => {
+    // TODO: switch to immutablejs for less expensive state clones
+    // and possibly normalize so we can already update at the current field level, no need to
+    // keep doing searches
+    const stateClone = cloneDeep(state);
+    const fieldsClone = stateClone.fields;
+    const { propertyName, newValue, field, isParentOnly } = payload;
+    const update = (fields, fieldId, parentOnly, backTrack) => {
+        if(fields) {
+            for(let i = 0; i < fields.length; i++) {
+                const f = fields[i];
+                if(f.id === fieldId) {
+                    if((!parentOnly || backTrack) && f.hasOwnProperty(propertyName)) {
+                        f[propertyName] = newValue;
+                        if(backTrack) {
+                            return;
+                        }
+                    } 
+
+                    if(!backTrack && f.parent && f.parent.hasOwnProperty(propertyName)) {
+                        f.parent[propertyName] = newValue;
+                        // walk back up the tree to update parent. only go one level back
+                        update(fieldsClone, f.parent.id, parentOnly, true);
+                    }
+                    return;
+                }
+                update(f.children, fieldId, parentOnly, backTrack);
+            }
+        }
+    };
+    update(fieldsClone, field.id, isParentOnly, false);
+    return stateClone;
+}
+
+const deleteField = (state, action) => {
+    const stateClone = cloneDeep(state);
+    const fieldClone = stateClone.fields;
+    const { field } = action.payload;
+
+    const findAndDestroy = (fields) => {
+        if(fields) {
+            for(let i = 0; i < fields.length; i++) {
+                const f = fields[i];
+                if(f.id === field.id) {
+                    remove(fields, (el) => {
+                       return el.id === field.id
+                    });
+                    return;
+                }
+                findAndDestroy(f.children);
+            }
+        }
+    }
+    findAndDestroy(fieldClone);
+    return stateClone;
+}
+
 // the conditional switch should ideally be more condensed and different functionality
 // split out
 const formBuilder = (state = initialState, action) => {
@@ -143,8 +203,12 @@ const formBuilder = (state = initialState, action) => {
             return changeFieldType(state, action);
         case types.ADD_SUB_INPUT:
             return addSubInput(state, action);
+        case types.CHANGE_PROPERTIES:
+            return updateProperty(state, action);
         case types.GET_INITIAL_FIELDS:
             return state.initialFieldChoices;
+        case types.DELETE_FIELD:
+            return deleteField(state, action);
         default:
             return state;
     }

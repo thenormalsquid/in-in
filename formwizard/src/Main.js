@@ -6,6 +6,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import * as actions from './actions';
 import FormBuilder from './FormBuilder';
+import Preview from './Preview';
 import 'react-tabs/style/react-tabs.css';
 import './Main.css';
 
@@ -25,7 +26,7 @@ class Main extends Component {
                 actions={actions}
               />
             </TabPanel>
-            <TabPanel><h1>dd</h1></TabPanel>
+            <TabPanel><Preview fields={fields} actions={actions} /></TabPanel>
             <TabPanel><h1>ee</h1></TabPanel>
           </Tabs>
         </section>);

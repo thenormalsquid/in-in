@@ -22,7 +22,13 @@ class Field extends Component {
         // need explicit binding for event handlers, otherwise we'd lose 'this' as
         // a reference to the current class
         this.handleSelectChange = this.handleSelectChange.bind(this);
+        this.handleChangeCond = this.handleChangeCond.bind(this);
+        this.handleChangeCondVal = this.handleChangeCondVal.bind(this);
         this.handleQuestionChange = this.handleQuestionChange.bind(this);
+    }
+
+    handleChangeCondVal(e) {
+        this.props.changeProperty(e.target.value, this.props.field, 'value', true);
     }
 
     handleSelectChange(e) {
@@ -34,6 +40,10 @@ class Field extends Component {
         this.props.changeProperty(e.target.value, this.props.field, 'question');
     }
 
+    handleChangeCond(e) {
+        this.props.changeProperty(e.target.value, this.props.field, 'parentCondValue');
+    }
+
     render() {
         const { initialFieldChoices, field, level, addSubInput } = this.props;
         return (
@@ -42,7 +52,7 @@ class Field extends Component {
                    {level > 0 && 
                     <div className="FormBuilder__Field__Conds">
                         <label htmlFor="conditions">Condition</label>
-                        <select name="conditions">
+                        <select name="conditions" onChange={this.handleChangeCond}>
                             {field.parent.conditionTypes.map((cond, i) => {
                                 return <option key={i} value={cond.value}>{cond.label}</option>
                             })}
@@ -50,18 +60,18 @@ class Field extends Component {
                         {/* conditional for yes/no case  */}
                         {field.parent.type === 'yes_no' ? 
                           <div className="FormBuilder__Field__Conds__Inp">
-                              <select name="yesNoCond" defaultValue={field.parent.value}>
+                              <select name="yesNoCond" value={field.parent.value} onChange={this.handleChangeCondVal}>
                                 {field.parent.inputFields.map((radio, i) => {
                                     return <option key={i} value={radio.value}>{radio.label}</option>
                                 })}
                               </select>
                           </div> :
-                          <input type={field.parent.type} />
+                          <input type={field.parent.type} value={field.parent.value || ''} onChange={this.handleChangeCondVal} />
                         }
                     </div>
                    }
                    <label htmlFor="question">Question</label>
-                   <input name="question" type="text" defaultValue="" value={field.question} onChange={this.handleQuestionChange} />
+                   <input name="question" type="text" value={field.question || ''} onChange={this.handleQuestionChange} />
                    <label htmlFor="type">Type</label>
                    <select name="type" defaultValue={field.type} onChange={this.handleSelectChange}>
                        {initialFieldChoices.map((choice, i) => {
@@ -70,7 +80,7 @@ class Field extends Component {
                    </select>
                     <div className="FormBuilder__ChildrenCtrl">
                         <Button type="sub-input" label="Add Sub-Input" action={addSubInput} value={field} />
-                        <Button type="delete" label="Delete" />
+                        <Button type="delete" label="Delete" action={this.props.deleteField} value={field} />
                     </div>
                 </fieldset> 
            </div>
@@ -101,6 +111,8 @@ class FormBuilder extends Component {
                      field={field}
                      changeFieldType={actions.changeFieldType}
                      addSubInput={actions.addSubInput}
+                     changeProperty={actions.changeProperty}
+                     deleteField={actions.deleteField}
                 />);
               recursiveWalk(field.children, level + 1);
             }, this);
